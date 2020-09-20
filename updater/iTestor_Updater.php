@@ -75,6 +75,7 @@ class iTestor_Updater
 			if ($this->authorize_token) {
 				$response['zipball_url'] = add_query_arg('access_token', $this->authorize_token, $response['zipball_url']);
 			}
+			error_log(print_r((object)$response, true));
 			$this->github_response = $response;
 		}
 	}
@@ -133,6 +134,7 @@ class iTestor_Updater
 					],
 					'download_link' => $this->github_response['zipball_url']
 				];
+				error_log(print_r((object)$plugin, true));
 				return (object)$plugin;
 			}
 		}
