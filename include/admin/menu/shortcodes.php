@@ -22,26 +22,6 @@
  * SOFTWARE.
  */
 
-/*
-Plugin Name: iTestor
-Plugin URI: https://github.com/Cro22/castflow
-Description: Provides a connection between Castflow and iTestor for data queries.
-Version: 1.0
-Author: Jesus Nuñez
-Author URI: https://github.com/Cro22
-License: MIT
-*/
 
-include_once(plugin_dir_path(__FILE__) . '/updater/iTestor_Updater.php');
-include_once(plugin_dir_path(__FILE__) . '/include/admin/admin_charge.php');
-
-
-//Updater
-$updater = new iTestor_Updater(__FILE__);
-$updater->set_username('cro22');
-$updater->set_repository('castflow');
-
-$updater->initialize();
-
-//Charge Admin
-add_action('admin_menu', 'admin_charge');
+function itestor_short_codes()
+{ }

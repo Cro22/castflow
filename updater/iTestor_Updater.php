@@ -32,7 +32,7 @@ class iTestor_Updater
 	private $repository;
 	private $authorize_token;
 	private $github_response;
-	
+
 	/**
 	 * iTestor_Updater constructor.
 	 * @param $file
@@ -43,14 +43,14 @@ class iTestor_Updater
 		add_action('admin_init', [$this, 'set_plugin_properties']);
 		return $this;
 	}
-	
+
 	public function set_plugin_properties()
 	{
 		$this->plugin = get_plugin_data($this->file);
 		$this->basename = plugin_basename($this->file);
 		$this->active = is_plugin_active($this->basename);
 	}
-	
+
 	/**
 	 * @param $username
 	 */
@@ -58,7 +58,7 @@ class iTestor_Updater
 	{
 		$this->username = $username;
 	}
-	
+
 	/**
 	 * @param $repository
 	 */
@@ -66,7 +66,7 @@ class iTestor_Updater
 	{
 		$this->repository = $repository;
 	}
-	
+
 	/**
 	 * @param $token
 	 */
@@ -74,14 +74,14 @@ class iTestor_Updater
 	{
 		$this->authorize_token = $token;
 	}
-	
+
 	public function initialize()
 	{
 		add_filter('pre_set_site_transient_update_plugins', [$this, 'modify_transient'], 10, 1);
 		add_filter('plugins_api', [$this, 'plugin_popup'], 10, 3);
 		add_filter('upgrader_post_install', [$this, 'after_install'], 10, 3);
 	}
-	
+
 	private function get_repository_info()
 	{
 		if (is_null($this->github_response)) {
@@ -96,18 +96,17 @@ class iTestor_Updater
 			if ($this->authorize_token) {
 				$response['zipball_url'] = add_query_arg('access_token', $this->authorize_token, $response['zipball_url']);
 			}
-			error_log(print_r((object)$response, true));
 			$this->github_response = $response;
 		}
 	}
-	
+
 	/**
 	 * @param $transient
 	 * @return mixed
 	 */
 	public function modify_transient($transient)
 	{
-		
+
 		if (property_exists($transient, 'checked')) {
 			if ($checked = $transient->checked) {
 				$this->get_repository_info();
@@ -127,7 +126,7 @@ class iTestor_Updater
 		}
 		return $transient;
 	}
-	
+
 	/**
 	 * @param $result
 	 * @param $action
@@ -139,7 +138,7 @@ class iTestor_Updater
 		if (!empty($args->slug)) {
 			if ($args->slug == current(explode('/', $this->basename))) {
 				$this->get_repository_info();
-				
+
 				$plugin = [
 					'name' => $this->plugin["Name"],
 					'slug' => $this->basename,
@@ -155,13 +154,12 @@ class iTestor_Updater
 					],
 					'download_link' => $this->github_response['zipball_url']
 				];
-				error_log(print_r((object)$plugin, true));
 				return (object)$plugin;
 			}
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * @param $response
 	 * @param $hook_extra
@@ -171,15 +169,15 @@ class iTestor_Updater
 	public function after_install($response, $hook_extra, $result)
 	{
 		global $wp_filesystem;
-		
+
 		$install_directory = plugin_dir_path($this->file);
 		$wp_filesystem->move($result['destination'], $install_directory);
 		$result['destination'] = $install_directory;
-		
+
 		if ($this->active) {
 			activate_plugin($this->basename);
 		}
 		return $result;
 	}
-	
+
 }
